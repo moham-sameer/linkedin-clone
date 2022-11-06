@@ -1,23 +1,53 @@
-import logo from './logo.svg';
+import React,{useEffect} from 'react';
 import './App.css';
-
+import Header from './Header';
+import Sidebar from './Sidebar'
+import Feed from './Feed'
+import Login from './Login'
+ import {useDispatch} from 'react-redux'
+ import {auth} from './firebase';
+import { selectUser,login,logout } from './Redux/userSlice';
+import { useSelector } from 'react-redux';
+import Widgets from './Widgets'
 function App() {
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    auth.onAuthStateChanged((userAuth)=>{
+      if(userAuth){
+        dispatch(login({
+          email:userAuth.email,
+          uid: userAuth.uid,
+          displayName:userAuth.displayName,
+          photoURL:userAuth.profilePic,
+        }))
+      }else{
+        dispatch(logout())
+      }
+    })
+  },[dispatch])
+  const user = useSelector(selectUser)
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+     {/* Header */}
+
+     {/* App Body */}
+     {!user ? <Login/>:
+  
+      <div className='App'>
+
+     <Header/>
+     
+      <div className='app_body'>
+          <Sidebar/>
+       <Feed/>
+       <Widgets/>
+      </div>
+      </div>
+     }
+              
+     {/* Widget */}
+
     </div>
   );
 }
